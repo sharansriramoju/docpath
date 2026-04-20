@@ -3,8 +3,10 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
   type ReactNode,
 } from "react";
+import { setLogoutHandler } from "../utils/api";
 
 export type Role = "admin" | "doctor" | "receptionist" | "nurse";
 
@@ -112,6 +114,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(userData);
     localStorage.setItem("userDetails", JSON.stringify(userData));
   }, []);
+
+  useEffect(() => {
+    setLogoutHandler(logout);
+  }, [logout]);
 
   return (
     <AuthContext.Provider

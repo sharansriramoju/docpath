@@ -1,18 +1,27 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import "./AppLayout.css";
 
-const AppLayout = () => (
-  <div className="app-layout">
-    <Sidebar />
-    <div className="app-main">
-      <Header />
-      <main className="app-content">
-        <Outlet />
-      </main>
+const AppLayout = () => {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  return (
+    <div className="app-layout">
+      <Sidebar />
+      <div className="app-main">
+        <Header />
+        <main className="app-content">
+          <Outlet />
+        </main>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default AppLayout;

@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseAPIURL } from "../common/constants";
+import api from "../utils/api";
 
 const initialState = {};
 
@@ -12,11 +11,7 @@ export const LoginSlice = createSlice({
 
 export const sendOtpRdx = (phone: string) => async () => {
   try {
-    const response = await axios.post(
-      baseAPIURL + "/send-otp-login",
-      { phone },
-      { withCredentials: true },
-    );
+    const response = await api.post("/send-otp-login", { phone });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message ?? "Failed to send OTP");
@@ -25,11 +20,7 @@ export const sendOtpRdx = (phone: string) => async () => {
 
 export const verifyOtpRdx = (phone: string, otp: string) => async () => {
   try {
-    const response = await axios.post(
-      baseAPIURL + "/verify-otp-login",
-      { phone, otp },
-      { withCredentials: true },
-    );
+    const response = await api.post("/verify-otp-login", { phone, otp });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message ?? "Failed to verify OTP");

@@ -11,6 +11,7 @@ import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import VisitConfig from "./pages/VisitConfig";
 import Login from "./pages/Login/Login";
+import GuestGuard from "./utils/GuestGuard";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +36,11 @@ const router = createBrowserRouter([
   },
   {
     path: "auth/login",
-    element: <Login />,
+    element: (
+      <GuestGuard>
+        <Login />
+      </GuestGuard>
+    ),
   },
 ]);
 
