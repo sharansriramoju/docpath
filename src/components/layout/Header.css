@@ -1,0 +1,57 @@
+.header {
+  height: var(--header-height);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.header-greeting {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+.header-greeting strong {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.header-icon-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.header-icon-btn:hover {
+  background: var(--color-gray-100);
+  color: var(--text-primary);
+}
+.header-icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+.header-notif-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger-500);
+  border: 2px solid var(--bg-surface);
+}
