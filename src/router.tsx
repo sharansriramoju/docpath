@@ -10,7 +10,7 @@ import TownVisits from "./pages/TownVisits";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import VisitConfig from "./pages/VisitConfig";
-import Login from "./pages/Login";
+import Login from "./pages/Login/Login";
 
 const router = createBrowserRouter([
   {

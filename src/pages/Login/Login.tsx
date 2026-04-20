@@ -1,24 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useAuth } from "../context/AuthContext";
-import { sendOtpRdx, verifyOtpRdx } from "../slices/LoginSlice";
-import type { AppDispatch } from "../store";
+import useLogin from "../../hooks/useLogin";
 import { Phone, Shield, ArrowRight, Stethoscope } from "lucide-react";
 import "./Login.css";
 
 const OTP_LENGTH = 6;
 
 const Login = () => {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const { phone, setPhone, loading, error, setError, sendOtp, verifyOtp } =
+    useLogin();
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -48,16 +40,13 @@ const Login = () => {
       setError("Please enter a valid 10-digit phone number");
       return;
     }
-    setLoading(true);
     try {
-      await dispatch(sendOtpRdx(digits));
+      await sendOtp(digits);
       setStep("otp");
       setCountdown(30);
       setTimeout(() => otpRefs.current[0]?.focus(), 50);
-    } catch (err: any) {
-      setError(err.message || "Failed to send OTP");
-    } finally {
-      setLoading(false);
+    } catch {
+      // error is set by the hook
     }
   };
 
@@ -104,29 +93,11 @@ const Login = () => {
       setError("Please enter the complete verification code");
       return;
     }
-    setLoading(true);
     try {
       const digits = phone.replace(/\D/g, "");
-      const result: any = await dispatch(verifyOtpRdx(digits, code));
-      const userData = result.data;
-      const roleName = (userData.role?.name || "doctor").toLowerCase() as
-        | "admin"
-        | "doctor"
-        | "receptionist"
-        | "nurse";
-      login({
-        id: userData.user_id,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
-        role: roleName,
-        avatar: null,
-      });
-      navigate("/");
-    } catch (err: any) {
-      setError(err.message || "Failed to verify OTP");
-    } finally {
-      setLoading(false);
+      await verifyOtp(digits, code);
+    } catch {
+      // error is set by the hook
     }
   };
 
@@ -134,12 +105,12 @@ const Login = () => {
     if (countdown > 0) return;
     try {
       const digits = phone.replace(/\D/g, "");
-      await dispatch(sendOtpRdx(digits));
+      await sendOtp(digits);
       setCountdown(30);
       setOtp(Array(OTP_LENGTH).fill(""));
       otpRefs.current[0]?.focus();
-    } catch (err: any) {
-      setError(err.message || "Failed to resend OTP");
+    } catch {
+      // error is set by the hook
     }
   };
 
