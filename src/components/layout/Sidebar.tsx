@@ -57,6 +57,10 @@ const NAV_SECTIONS: NavSection[] = [
       { to: "/settings", icon: Settings, label: "Settings" },
     ],
   },
+  {
+    label: "Locations",
+    items: [{ to: "/locations", icon: MapPin, label: "Manage Locations" }],
+  },
 ];
 
 const Sidebar = () => {

@@ -10,6 +10,7 @@ import TownVisits from "./pages/TownVisits";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import VisitConfig from "./pages/VisitConfig";
+import Locations from "./pages/Locations";
 import Login from "./pages/Login/Login";
 import GuestGuard from "./utils/GuestGuard";
 
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <UserManagement />,
+      },
+      {
+        path: "locations",
+        element: <Locations />,
       },
       { path: "settings", element: <Settings /> },
     ],
