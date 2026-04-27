@@ -12,7 +12,11 @@ import {
   CalendarCog,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import type { Permission } from "../../context/AuthContext";
+import type {
+  AccessAction,
+  AccessResource,
+  Permission,
+} from "../../context/AuthContext";
 import Avatar from "../ui/Avatar";
 import "./Sidebar.css";
 
@@ -21,6 +25,10 @@ interface NavItem {
   icon: ElementType;
   label: string;
   permission?: Permission;
+  access?: {
+    action: AccessAction;
+    resource: AccessResource;
+  };
 }
 
 interface NavSection {
@@ -59,12 +67,19 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     label: "Locations",
-    items: [{ to: "/locations", icon: MapPin, label: "Manage Locations" }],
+    items: [
+      {
+        to: "/locations",
+        icon: MapPin,
+        label: "Manage Locations",
+        access: { action: "read", resource: "Locations" },
+      },
+    ],
   },
 ];
 
 const Sidebar = () => {
-  const { user, hasPermission } = useAuth();
+  const { user, hasPermission, can } = useAuth();
 
   return (
     <aside className="sidebar">
@@ -82,7 +97,10 @@ const Sidebar = () => {
             <div className="sidebar-section-label">{section.label}</div>
             {section.items
               .filter(
-                (item) => !item.permission || hasPermission(item.permission),
+                (item) =>
+                  (!item.permission || hasPermission(item.permission)) &&
+                  (!item.access ||
+                    can(item.access.action, item.access.resource)),
               )
               .map((item) => (
                 <NavLink

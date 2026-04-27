@@ -34,7 +34,11 @@ const router = createBrowserRouter([
       },
       {
         path: "locations",
-        element: <Locations />,
+        element: (
+          <PermissionGuard action="read" resource="Locations">
+            <Locations />
+          </PermissionGuard>
+        ),
       },
       { path: "settings", element: <Settings /> },
     ],

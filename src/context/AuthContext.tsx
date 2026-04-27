@@ -21,6 +21,10 @@ export type Permission =
   | "manage_users"
   | "manage_settings";
 
+export type AccessAction = "read" | "create" | "update";
+
+export type AccessResource = "Locations";
+
 export interface User {
   id: string;
   name: string;
@@ -36,6 +40,7 @@ interface AuthContextValue {
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
   hasRole: (role: Role) => boolean;
+  can: (action: AccessAction, resource: AccessResource) => boolean;
   ROLE_PERMISSIONS: Record<Role, Permission[]>;
 }
 
@@ -79,6 +84,20 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
 };
 
+const ROLE_ACCESS: Record<
+  Role,
+  Partial<Record<AccessResource, AccessAction[]>>
+> = {
+  admin: {
+    Locations: ["read", "create", "update"],
+  },
+  doctor: {
+    Locations: ["read", "create", "update"],
+  },
+  receptionist: {},
+  nurse: {},
+};
+
 // Restore user from localStorage if available
 const getStoredUser = (): User | null => {
   try {
@@ -105,6 +124,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const hasRole = useCallback((role: Role) => user?.role === role, [user]);
 
+  const can = useCallback(
+    (action: AccessAction, resource: AccessResource) => {
+      if (!user) return false;
+      const allowedActions = ROLE_ACCESS[user.role]?.[resource] || [];
+      return allowedActions.includes(action);
+    },
+    [user],
+  );
+
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem("userDetails");
@@ -121,7 +149,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, hasPermission, hasRole, ROLE_PERMISSIONS }}
+      value={{
+        user,
+        login,
+        logout,
+        hasPermission,
+        hasRole,
+        can,
+        ROLE_PERMISSIONS,
+      }}
     >
       {children}
     </AuthContext.Provider>

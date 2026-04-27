@@ -13,6 +13,7 @@ import {
 } from "../components/ui";
 import api from "../utils/api";
 import type { TableColumn } from "../components/ui/Table";
+import { useAuth } from "../context/AuthContext";
 
 type LocationStatus = "active" | "inactive";
 
@@ -69,6 +70,7 @@ const EMPTY_FORM: LocationFormData = {
 };
 
 const Locations = () => {
+  const { can } = useAuth();
   const [locations, setLocations] = useState<Location[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -88,28 +90,41 @@ const Locations = () => {
   const [formData, setFormData] = useState<LocationFormData>(EMPTY_FORM);
   const [formErrors, setFormErrors] = useState<Partial<LocationFormData>>({});
 
-  const fetchLocations = useCallback(async (searchText: string) => {
-    setLoading(true);
-    setLoadError("");
+  const canReadLocations = can("read", "Locations");
+  const canCreateLocations = can("create", "Locations");
+  const canUpdateLocations = can("update", "Locations");
 
-    try {
-      const response = await api.get<LocationsResponse>("/locations", {
-        params: {
-          search: searchText || undefined,
-          page: 1,
-          limit: 50,
-        },
-      });
+  const fetchLocations = useCallback(
+    async (searchText: string) => {
+      if (!canReadLocations) {
+        setLocations([]);
+        setLoading(false);
+        return;
+      }
 
-      setLocations(response.data.data.rows);
-    } catch (error) {
-      console.error("Failed to load locations", error);
-      setLoadError("Unable to load locations. Please try again.");
-      setLocations([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        const response = await api.get<LocationsResponse>("/locations", {
+          params: {
+            search: searchText || undefined,
+            page: 1,
+            limit: 50,
+          },
+        });
+
+        setLocations(response.data.data.rows);
+      } catch (error) {
+        console.error("Failed to load locations", error);
+        setLoadError("Unable to load locations. Please try again.");
+        setLocations([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [canReadLocations],
+  );
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -142,6 +157,8 @@ const Locations = () => {
   };
 
   const openAddModal = () => {
+    if (!canCreateLocations) return;
+
     setModalMode("add");
     setSelectedLocationId(null);
     setFormData(EMPTY_FORM);
@@ -151,6 +168,8 @@ const Locations = () => {
   };
 
   const openEditModal = async (locationId: string) => {
+    if (!canUpdateLocations) return;
+
     setLoadingLocationId(locationId);
     setSaveError("");
     setFormErrors({});
@@ -190,6 +209,8 @@ const Locations = () => {
   };
 
   const handleSubmit = async () => {
+    if (modalMode === "add" && !canCreateLocations) return;
+    if (modalMode === "edit" && !canUpdateLocations) return;
     if (!validateForm()) return;
 
     setSaving(true);
@@ -299,9 +320,11 @@ const Locations = () => {
         title="Locations"
         subtitle="Manage all location records for scheduling and visits"
         actions={
-          <Button icon={Plus} onClick={openAddModal}>
-            Add Location
-          </Button>
+          canCreateLocations ? (
+            <Button icon={Plus} onClick={openAddModal}>
+              Add Location
+            </Button>
+          ) : null
         }
       />
 
@@ -347,16 +370,20 @@ const Locations = () => {
           columns={columns}
           data={tableRows}
           emptyMessage={loading ? "Loading locations..." : "No locations found"}
-          renderActions={(row) => (
-            <Button
-              variant="outline"
-              size="sm"
-              icon={Edit2}
-              onClick={() => void openEditModal(row.location_id)}
-              disabled={loadingLocationId === row.location_id}
-              title="Edit"
-            />
-          )}
+          renderActions={
+            canUpdateLocations
+              ? (row) => (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    icon={Edit2}
+                    onClick={() => void openEditModal(row.location_id)}
+                    disabled={loadingLocationId === row.location_id}
+                    title="Edit"
+                  />
+                )
+              : undefined
+          }
         />
       </Card>
 
