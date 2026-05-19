@@ -48,11 +48,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     label: "Schedule",
-    items: [
-      { to: "/schedule", icon: Stethoscope, label: "Doctor Schedule" },
-      { to: "/visits", icon: MapPin, label: "Town Visits" },
-      { to: "/visit-config", icon: CalendarCog, label: "Visit Config" },
-    ],
+    items: [{ to: "/schedule", icon: Stethoscope, label: "Doctor Schedule" }],
   },
   {
     label: "Administration",
