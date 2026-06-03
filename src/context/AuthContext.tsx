@@ -23,7 +23,13 @@ export type Permission =
 
 export type AccessAction = "read" | "create" | "update";
 
-export type AccessResource = "Locations";
+export type AccessResource =
+  | "Locations"
+  | "DoctorRoutines"
+  | "Patients"
+  | "Records"
+  | "Appointments"
+  | "Users";
 
 export interface User {
   id: string;
@@ -93,6 +99,7 @@ const ROLE_ACCESS: Record<
   },
   doctor: {
     Locations: ["read", "create", "update"],
+    DoctorRoutines: ["read", "create", "update"],
   },
   receptionist: {},
   nurse: {},

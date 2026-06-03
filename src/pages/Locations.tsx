@@ -11,9 +11,10 @@ import {
   Select,
   Table,
 } from "../components/ui";
-import api from "../utils/api";
+import useLocations from "../hooks/useLocations";
 import type { TableColumn } from "../components/ui/Table";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 type LocationStatus = "active" | "inactive";
 
@@ -71,70 +72,64 @@ const EMPTY_FORM: LocationFormData = {
 
 const Locations = () => {
   const { can } = useAuth();
-  const [locations, setLocations] = useState<Location[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const {
+    locations,
+    totalCount,
+    loading,
+    error: loadError,
+    loadingLocationId,
+    saving,
+    saveError,
+    fetchLocations,
+    fetchLocationById,
+    saveLocation,
+    setError,
+    setSaveError,
+    clearErrors,
+  } = useLocations();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(
     null,
   );
-  const [loadingLocationId, setLoadingLocationId] = useState<string | null>(
-    null,
-  );
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState("");
 
   const [formData, setFormData] = useState<LocationFormData>(EMPTY_FORM);
   const [formErrors, setFormErrors] = useState<Partial<LocationFormData>>({});
+
+  const { showToast } = useToast();
 
   const canReadLocations = can("read", "Locations");
   const canCreateLocations = can("create", "Locations");
   const canUpdateLocations = can("update", "Locations");
 
-  const fetchLocations = useCallback(
-    async (searchText: string) => {
-      if (!canReadLocations) {
-        setLocations([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setLoadError("");
-
-      try {
-        const response = await api.get<LocationsResponse>("/locations", {
-          params: {
-            search: searchText || undefined,
-            page: 1,
-            limit: 50,
-          },
-        });
-
-        setLocations(response.data.data.rows);
-      } catch (error) {
-        console.error("Failed to load locations", error);
-        setLoadError("Unable to load locations. Please try again.");
-        setLocations([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [canReadLocations],
-  );
+  useEffect(() => {
+    if (!loadError) return;
+    showToast(loadError, "error");
+    setError("");
+  }, [loadError]);
 
   useEffect(() => {
+    if (!saveError) return;
+    showToast(saveError, "error");
+    setSaveError("");
+  }, [saveError]);
+
+  useEffect(() => {
+    if (!canReadLocations) return;
+
     const timeoutId = window.setTimeout(() => {
-      void fetchLocations(search);
+      void fetchLocations(search, page, limit);
     }, 350);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [fetchLocations, search]);
+  }, [canReadLocations, fetchLocations, page, limit, search]);
 
   const tableRows = useMemo<LocationRow[]>(
     () =>
@@ -163,22 +158,22 @@ const Locations = () => {
     setSelectedLocationId(null);
     setFormData(EMPTY_FORM);
     setFormErrors({});
-    setSaveError("");
+    clearErrors();
     setModalOpen(true);
   };
 
   const openEditModal = async (locationId: string) => {
     if (!canUpdateLocations) return;
 
-    setLoadingLocationId(locationId);
-    setSaveError("");
+    clearErrors();
     setFormErrors({});
 
     try {
-      const response = await api.get<LocationByIdResponse>(
-        `/location/${locationId}`,
-      );
-      const location = response.data.data;
+      const location = await fetchLocationById(locationId);
+      if (!location) {
+        setError("Unable to open location details. Please try again.");
+        return;
+      }
 
       setModalMode("edit");
       setSelectedLocationId(location.location_id);
@@ -191,10 +186,7 @@ const Locations = () => {
       });
       setModalOpen(true);
     } catch (error) {
-      console.error("Failed to fetch location by id", error);
-      setLoadError("Unable to open location details. Please try again.");
-    } finally {
-      setLoadingLocationId(null);
+      setError("Unable to open location details. Please try again.");
     }
   };
 
@@ -204,7 +196,7 @@ const Locations = () => {
     setModalOpen(false);
     setFormData(EMPTY_FORM);
     setFormErrors({});
-    setSaveError("");
+    clearErrors();
     setSelectedLocationId(null);
   };
 
@@ -213,16 +205,18 @@ const Locations = () => {
     if (modalMode === "edit" && !canUpdateLocations) return;
     if (!validateForm()) return;
 
-    setSaving(true);
-    setSaveError("");
+    clearErrors();
 
     try {
       if (modalMode === "add") {
-        await api.post<SaveLocationResponse>("/location", {
-          name: formData.name.trim(),
-          latitude: formData.latitude.trim(),
-          longitude: formData.longitude.trim(),
-          google_maps_url: formData.google_maps_url.trim(),
+        await saveLocation({
+          mode: "add",
+          data: {
+            name: formData.name.trim(),
+            latitude: formData.latitude.trim(),
+            longitude: formData.longitude.trim(),
+            google_maps_url: formData.google_maps_url.trim(),
+          },
         });
       } else {
         if (!selectedLocationId) {
@@ -230,25 +224,25 @@ const Locations = () => {
           return;
         }
 
-        await api.put<SaveLocationResponse>("/location", {
-          location_id: selectedLocationId,
-          name: formData.name.trim(),
-          latitude: formData.latitude.trim(),
-          longitude: formData.longitude.trim(),
-          google_maps_url: formData.google_maps_url.trim(),
-          status: formData.status,
+        await saveLocation({
+          mode: "edit",
+          data: {
+            location_id: selectedLocationId,
+            name: formData.name.trim(),
+            latitude: formData.latitude.trim(),
+            longitude: formData.longitude.trim(),
+            google_maps_url: formData.google_maps_url.trim(),
+            status: formData.status,
+          },
         });
       }
 
       closeModal();
-      await fetchLocations(search);
+      await fetchLocations(search, page, limit);
     } catch (error) {
-      console.error("Failed to save location", error);
       setSaveError(
         "Unable to save location. Please check values and try again.",
       );
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -310,9 +304,11 @@ const Locations = () => {
     },
   ];
 
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
   const subtitle = loading
     ? "Loading locations..."
-    : `${tableRows.length} location${tableRows.length !== 1 ? "s" : ""}`;
+    : `${tableRows.length} of ${totalCount} location${totalCount !== 1 ? "s" : ""}`;
 
   return (
     <div>
@@ -339,11 +335,36 @@ const Locations = () => {
             flexWrap: "wrap",
           }}
         >
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Search locations..."
-          />
+          <div
+            style={{
+              display: "flex",
+              gap: "var(--space-3)",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <SearchBar
+              value={search}
+              onChange={(value) => {
+                setPage(1);
+                setSearch(value);
+              }}
+              placeholder="Search locations..."
+            />
+            <Select
+              label="Page size"
+              value={String(limit)}
+              onChange={(e) => {
+                setPage(1);
+                setLimit(Number(e.target.value));
+              }}
+              options={[
+                { value: "10", label: "10 per page" },
+                { value: "25", label: "25 per page" },
+                { value: "50", label: "50 per page" },
+              ]}
+            />
+          </div>
           <span
             style={{
               fontSize: "var(--font-size-sm)",
@@ -353,18 +374,6 @@ const Locations = () => {
             {subtitle}
           </span>
         </div>
-
-        {loadError ? (
-          <div
-            style={{
-              padding: "0 var(--space-5) var(--space-4)",
-              color: "var(--color-danger-700)",
-              fontSize: "var(--font-size-sm)",
-            }}
-          >
-            {loadError}
-          </div>
-        ) : null}
 
         <Table<LocationRow>
           columns={columns}
@@ -385,6 +394,42 @@ const Locations = () => {
               : undefined
           }
         />
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "var(--space-4) var(--space-5)",
+            gap: "var(--space-3)",
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "var(--font-size-sm)",
+              color: "var(--text-muted)",
+            }}
+          >
+            Page {page} of {totalPages}
+          </span>
+          <div style={{ display: "flex", gap: "var(--space-2)" }}>
+            <Button
+              variant="outline"
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page <= 1 || loading}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={page >= totalPages || loading}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </Card>
 
       <Modal
@@ -484,16 +529,6 @@ const Locations = () => {
             />
           ) : null}
 
-          {saveError ? (
-            <div
-              style={{
-                color: "var(--color-danger-700)",
-                fontSize: "var(--font-size-sm)",
-              }}
-            >
-              {saveError}
-            </div>
-          ) : null}
         </div>
       </Modal>
     </div>

@@ -11,3 +11,4 @@ export { default as EmptyState } from "./EmptyState";
 export { default as StatusDot } from "./StatusDot";
 export { default as SearchBar } from "./SearchBar";
 export { default as Tabs } from "./Tabs";
+export { default as MultiSelectCheckbox } from "./MultiSelectCheckbox";

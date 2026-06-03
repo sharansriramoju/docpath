@@ -72,6 +72,17 @@ const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  {
+    label: "Doctor Routines",
+    items: [
+      {
+        to: "/doctor-routines",
+        icon: CalendarCog,
+        label: "Manage Doctor Routines",
+        access: { action: "read", resource: "DoctorRoutines" },
+      },
+    ],
+  },
 ];
 
 const Sidebar = () => {
