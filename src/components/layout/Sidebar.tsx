@@ -48,7 +48,15 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     label: "Schedule",
-    items: [{ to: "/schedule", icon: Stethoscope, label: "Doctor Schedule" }],
+    items: [
+      { to: "/schedule", icon: Stethoscope, label: "Doctor Schedule" },
+      {
+        to: "/doctor-routines",
+        icon: CalendarCog,
+        label: "Manage Doctor Routines",
+        access: { action: "read", resource: "DoctorRoutines" },
+      },
+    ],
   },
   {
     label: "Administration",
@@ -69,17 +77,6 @@ const NAV_SECTIONS: NavSection[] = [
         icon: MapPin,
         label: "Manage Locations",
         access: { action: "read", resource: "Locations" },
-      },
-    ],
-  },
-  {
-    label: "Doctor Routines",
-    items: [
-      {
-        to: "/doctor-routines",
-        icon: CalendarCog,
-        label: "Manage Doctor Routines",
-        access: { action: "read", resource: "DoctorRoutines" },
       },
     ],
   },
