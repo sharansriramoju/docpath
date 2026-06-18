@@ -10,6 +10,7 @@ import {
   MapPin,
   Settings,
   CalendarCog,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import type {
@@ -65,6 +66,12 @@ const NAV_SECTIONS: NavSection[] = [
         to: "/users",
         icon: UserCog,
         label: "User Management",
+      },
+      {
+        to: "/roles",
+        icon: ShieldCheck,
+        label: "Roles Management",
+        access: { action: "read", resource: "Roles" },
       },
       { to: "/settings", icon: Settings, label: "Settings" },
     ],
