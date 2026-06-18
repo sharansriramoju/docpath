@@ -12,6 +12,7 @@ import Locations from "./pages/Locations";
 import Login from "./pages/Login/Login";
 import GuestGuard from "./utils/GuestGuard";
 import DoctorRoutines from "./pages/DoctorRoutines";
+import Roles from "./pages/Roles";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
         element: (
           <PermissionGuard action="read" resource="DoctorRoutines">
             <DoctorRoutines />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "roles",
+        element: (
+          <PermissionGuard action="read" resource="Roles">
+            <Roles />
           </PermissionGuard>
         ),
       },
