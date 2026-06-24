@@ -5,6 +5,7 @@ interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  label?: string;
   className?: string;
 }
 
@@ -12,34 +13,46 @@ const SearchBar = ({
   value,
   onChange,
   placeholder = "Search...",
+  label,
   className = "",
-}: SearchBarProps) => (
-  <div
-    style={{
-      position: "relative",
-      display: "inline-flex",
-      alignItems: "center",
-    }}
-    className={className}
-  >
-    <Search
-      size={16}
+}: SearchBarProps) => {
+  const input = (
+    <div
       style={{
-        position: "absolute",
-        left: 12,
-        color: "var(--text-muted)",
-        pointerEvents: "none",
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
       }}
-    />
-    <input
-      type="text"
-      className="form-input"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      style={{ paddingLeft: "2.25rem", minWidth: 220 }}
-    />
-  </div>
-);
+      className={label ? "" : className}
+    >
+      <Search
+        size={16}
+        style={{
+          position: "absolute",
+          left: 12,
+          color: "var(--text-muted)",
+          pointerEvents: "none",
+        }}
+      />
+      <input
+        type="text"
+        className="form-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{ paddingLeft: "2.25rem", minWidth: 220 }}
+      />
+    </div>
+  );
+
+  if (!label) return input;
+
+  return (
+    <div className={`form-field ${className}`}>
+      <label className="form-label">{label}</label>
+      {input}
+    </div>
+  );
+};
 
 export default SearchBar;

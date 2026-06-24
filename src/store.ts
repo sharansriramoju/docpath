@@ -1,13 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { LoginSlice } from "./slices/LoginSlice";
 import { LocationsSlice } from "./slices/LocationsSlice";
-import DoctorRoutinesSlice from "./slices/DoctorRoutinesSlice";
+import { UsersSlice } from "./slices/UsersSlice";
+import { PatientsSlice } from "./slices/PatientsSlice";
+import { AppointmentsSlice } from "./slices/AppointmentsSlice";
 
 const store = configureStore({
   reducer: {
     login: LoginSlice.reducer,
     locations: LocationsSlice.reducer,
-    doctorRoutine: DoctorRoutinesSlice.reducer,
+    users: UsersSlice.reducer,
+    patients: PatientsSlice.reducer,
+    appointments: AppointmentsSlice.reducer,
   },
 });
 

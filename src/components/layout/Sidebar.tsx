@@ -1,15 +1,10 @@
 import { NavLink } from "react-router-dom";
 import type { ElementType } from "react";
 import {
-  LayoutDashboard,
   Calendar,
   Users,
-  Stethoscope,
-  ClipboardList,
   UserCog,
   MapPin,
-  Settings,
-  CalendarCog,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import type {
@@ -40,22 +35,8 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
     items: [
-      { to: "/", icon: LayoutDashboard, label: "Dashboard" },
       { to: "/appointments", icon: Calendar, label: "Appointments" },
       { to: "/patients", icon: Users, label: "Patients" },
-      { to: "/records", icon: ClipboardList, label: "Medical Records" },
-    ],
-  },
-  {
-    label: "Schedule",
-    items: [
-      { to: "/schedule", icon: Stethoscope, label: "Doctor Schedule" },
-      {
-        to: "/doctor-routines",
-        icon: CalendarCog,
-        label: "Manage Doctor Routines",
-        access: { action: "read", resource: "DoctorRoutines" },
-      },
     ],
   },
   {
@@ -66,7 +47,6 @@ const NAV_SECTIONS: NavSection[] = [
         icon: UserCog,
         label: "User Management",
       },
-      { to: "/settings", icon: Settings, label: "Settings" },
     ],
   },
   {
