@@ -216,7 +216,10 @@ const layoutDay = (
 };
 
 const Appointments = () => {
-  const { user } = useAuth();
+  const { user, can } = useAuth();
+  const canCreateAppt = can("create", "Appointments");
+  const canUpdateAppt = can("update", "Appointments");
+  const canDeleteAppt = can("delete", "Appointments");
   const { showToast } = useToast();
   const isDoctor = (user?.role || "").toLowerCase().includes("doctor");
   const {
@@ -744,9 +747,11 @@ const Appointments = () => {
         title="Appointments"
         subtitle="Calendar overview of scheduled appointments"
         actions={
-          <Button icon={Plus} onClick={openCreate}>
-            New Appointment
-          </Button>
+          canCreateAppt ? (
+            <Button icon={Plus} onClick={openCreate}>
+              New Appointment
+            </Button>
+          ) : null
         }
       />
 
@@ -1001,7 +1006,7 @@ const Appointments = () => {
                 <div
                   className="cal-events-layer cal-events-layer--drag"
                   ref={eventsLayerRef}
-                  onMouseDown={startDrag}
+                  onMouseDown={canCreateAppt ? startDrag : undefined}
                 >
                   {dayBlocks.map(({ appt, top, height, leftPct, widthPct }) => (
                     <div
@@ -1078,7 +1083,7 @@ const Appointments = () => {
                   Notes
                 </Button>
               ) : null}
-              {detailTarget.status === "scheduled" ? (
+              {detailTarget.status === "scheduled" && canUpdateAppt ? (
                 <Button
                   variant="outline"
                   icon={Edit2}
@@ -1087,7 +1092,7 @@ const Appointments = () => {
                   Reschedule
                 </Button>
               ) : null}
-              {detailTarget.status === "scheduled" ? (
+              {detailTarget.status === "scheduled" && canDeleteAppt ? (
                 <Button
                   variant="danger"
                   icon={Ban}

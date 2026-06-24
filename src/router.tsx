@@ -5,6 +5,7 @@ import Appointments from "./pages/Appointments";
 import Patients from "./pages/Patients";
 import UserManagement from "./pages/UserManagement";
 import Locations from "./pages/Locations";
+import Roles from "./pages/Roles";
 import Login from "./pages/Login/Login";
 import GuestGuard from "./utils/GuestGuard";
 
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
         element: (
           <PermissionGuard action="read" resource="Locations">
             <Locations />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "roles",
+        element: (
+          <PermissionGuard action="read" resource="Roles">
+            <Roles />
           </PermissionGuard>
         ),
       },

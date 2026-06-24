@@ -38,6 +38,9 @@ const useLogin = () => {
         | "doctor"
         | "receptionist"
         | "nurse";
+      const permissions = (
+        userData.role?.permissions ?? userData.permissions ?? []
+      ).map((p: any) => ({ action: p.action, subject: p.subject }));
       login({
         id: userData.user_id,
         name: userData.name,
@@ -45,6 +48,7 @@ const useLogin = () => {
         phone: userData.phone,
         role: roleName,
         avatar: null,
+        permissions,
       });
       navigate("/");
     } catch (err: any) {

@@ -20,6 +20,7 @@ import type {
   DoctorRef,
   LocationRef,
 } from "../slices/UsersSlice";
+import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 
 type BadgeVariant = "default" | "primary" | "danger" | "success" | "warning";
@@ -101,6 +102,10 @@ const buildDob = (parts: {
     : "";
 
 const UserManagement = () => {
+  const { can } = useAuth();
+  const canCreateUsers = can("create", "Users");
+  const canUpdateUsers = can("update", "Users");
+  const canDeleteUsers = can("delete", "Users");
   const { showToast } = useToast();
   const {
     users,
@@ -496,9 +501,11 @@ const UserManagement = () => {
         title="User Management"
         subtitle="Manage clinic staff accounts, roles, and permissions"
         actions={
-          <Button icon={Plus} onClick={() => void openAddModal()}>
-            Add User
-          </Button>
+          canCreateUsers ? (
+            <Button icon={Plus} onClick={() => void openAddModal()}>
+              Add User
+            </Button>
+          ) : null
         }
       />
 
@@ -568,26 +575,34 @@ const UserManagement = () => {
           columns={columns}
           data={tableRows}
           emptyMessage={loading ? "Loading users..." : "No users found"}
-          renderActions={(row) => (
-            <div style={{ display: "flex", gap: "var(--space-2)" }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={Edit2}
-                title="Edit"
-                onClick={() => void openEditModal(row.user_id)}
-                disabled={loadingUserId === row.user_id}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={Trash2}
-                title="Delete"
-                onClick={() => setDeleteTarget(row)}
-                disabled={deletingUserId === row.user_id}
-              />
-            </div>
-          )}
+          renderActions={
+            canUpdateUsers || canDeleteUsers
+              ? (row) => (
+                  <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                    {canUpdateUsers ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Edit2}
+                        title="Edit"
+                        onClick={() => void openEditModal(row.user_id)}
+                        disabled={loadingUserId === row.user_id}
+                      />
+                    ) : null}
+                    {canDeleteUsers ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Trash2}
+                        title="Delete"
+                        onClick={() => setDeleteTarget(row)}
+                        disabled={deletingUserId === row.user_id}
+                      />
+                    ) : null}
+                  </div>
+                )
+              : undefined
+          }
         />
 
         <div

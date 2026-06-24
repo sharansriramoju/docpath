@@ -1,11 +1,6 @@
 import { NavLink } from "react-router-dom";
 import type { ElementType } from "react";
-import {
-  Calendar,
-  Users,
-  UserCog,
-  MapPin,
-} from "lucide-react";
+import { Calendar, Users, UserCog, MapPin, Shield } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import type {
   AccessAction,
@@ -35,8 +30,18 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
     items: [
-      { to: "/appointments", icon: Calendar, label: "Appointments" },
-      { to: "/patients", icon: Users, label: "Patients" },
+      {
+        to: "/appointments",
+        icon: Calendar,
+        label: "Appointments",
+        access: { action: "read" as AccessAction, resource: "Appointments" as AccessResource },
+      },
+      {
+        to: "/patients",
+        icon: Users,
+        label: "Patients",
+        access: { action: "read" as AccessAction, resource: "Patients" as AccessResource },
+      },
     ],
   },
   {
@@ -46,6 +51,13 @@ const NAV_SECTIONS: NavSection[] = [
         to: "/users",
         icon: UserCog,
         label: "User Management",
+        access: { action: "read" as AccessAction, resource: "Users" as AccessResource },
+      },
+      {
+        to: "/roles",
+        icon: Shield,
+        label: "Roles & Access",
+        access: { action: "read" as AccessAction, resource: "Roles" as AccessResource },
       },
     ],
   },

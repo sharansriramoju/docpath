@@ -6,7 +6,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { setLogoutHandler } from "../utils/api";
+import api, { setLogoutHandler } from "../utils/api";
 
 export type Role = "admin" | "doctor" | "receptionist" | "nurse";
 
@@ -21,14 +21,20 @@ export type Permission =
   | "manage_users"
   | "manage_settings";
 
-export type AccessAction = "read" | "create" | "update" | "delete";
+export type AccessAction = "read" | "create" | "update" | "delete" | "manage";
 
 export type AccessResource =
   | "Locations"
   | "Patients"
   | "Appointments"
   | "Users"
-  | "Roles";
+  | "Roles"
+  | "PatientDiagnostics";
+
+export interface ApiPermission {
+  action: string;
+  subject: string;
+}
 
 export interface User {
   id: string;
@@ -37,10 +43,12 @@ export interface User {
   phone?: string;
   role: Role;
   avatar: string | null;
+  permissions?: ApiPermission[];
 }
 
 interface AuthContextValue {
   user: User | null;
+  authLoading: boolean;
   login: (userData: User) => void;
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
@@ -51,7 +59,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Role definitions with permissions
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: [
     "view_dashboard",
@@ -89,35 +96,32 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
 };
 
-const ROLE_ACCESS: Record<
-  Role,
-  Partial<Record<AccessResource, AccessAction[]>>
-> = {
-  admin: {
-    Locations: ["read", "create", "update"],
-    Roles: ["read", "create", "update", "delete"],
-  },
-  doctor: {
-    Locations: ["read", "create", "update"],
-  },
-  receptionist: {},
-  nurse: {},
+const storeDisplayData = (userData: User) => {
+  localStorage.setItem(
+    "userDetails",
+    JSON.stringify({
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+    }),
+  );
 };
 
-// Restore user from localStorage if available
 const getStoredUser = (): User | null => {
   try {
     const stored = localStorage.getItem("userDetails");
     if (!stored) return null;
-    const data = JSON.parse(stored);
-    return data as User;
+    return JSON.parse(stored) as User;
   } catch {
     return null;
   }
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(getStoredUser);
+  const storedUser = getStoredUser();
+  const [user, setUser] = useState<User | null>(storedUser);
+  const [authLoading, setAuthLoading] = useState(!!storedUser);
 
   const hasPermission = useCallback(
     (permission: Permission) => {
@@ -132,9 +136,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const can = useCallback(
     (action: AccessAction, resource: AccessResource) => {
-      if (!user) return false;
-      const allowedActions = ROLE_ACCESS[user.role]?.[resource] || [];
-      return allowedActions.includes(action);
+      if (!user?.permissions) return false;
+      return user.permissions.some(
+        (p) =>
+          (p.action === action || p.action === "manage") &&
+          (p.subject === resource || p.subject === "all"),
+      );
     },
     [user],
   );
@@ -146,17 +153,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback((userData: User) => {
     setUser(userData);
-    localStorage.setItem("userDetails", JSON.stringify(userData));
+    storeDisplayData(userData);
   }, []);
 
   useEffect(() => {
     setLogoutHandler(logout);
   }, [logout]);
 
+  useEffect(() => {
+    if (!storedUser) return;
+
+    let cancelled = false;
+    const fetchMe = async () => {
+      try {
+        const response = await api.get<any>("/auth/me");
+        if (cancelled) return;
+        const data = response.data?.data ?? response.data;
+        const roleName = (
+          data.role?.name || data.role || "doctor"
+        ).toLowerCase() as Role;
+        const permissions: ApiPermission[] = (
+          data.role?.permissions ?? data.permissions ?? []
+        ).map((p: any) => ({
+          action: p.action,
+          subject: p.subject,
+        }));
+        const fullUser: User = {
+          id: data.user_id ?? data.id ?? storedUser.id,
+          name: data.name ?? storedUser.name,
+          email: data.email ?? storedUser.email,
+          phone: data.phone,
+          role: roleName,
+          avatar: data.profile_image_url ?? null,
+          permissions,
+        };
+        setUser(fullUser);
+        storeDisplayData(fullUser);
+      } catch {
+        if (cancelled) return;
+        setUser(null);
+        localStorage.removeItem("userDetails");
+      } finally {
+        if (!cancelled) setAuthLoading(false);
+      }
+    };
+    void fetchMe();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        authLoading,
         login,
         logout,
         hasPermission,
