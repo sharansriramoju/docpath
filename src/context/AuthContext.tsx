@@ -21,13 +21,14 @@ export type Permission =
   | "manage_users"
   | "manage_settings";
 
-export type AccessAction = "read" | "create" | "update";
+export type AccessAction = "read" | "create" | "update" | "delete";
 
 export type AccessResource =
   | "Locations"
   | "Patients"
   | "Appointments"
-  | "Users";
+  | "Users"
+  | "Roles";
 
 export interface User {
   id: string;
@@ -94,6 +95,7 @@ const ROLE_ACCESS: Record<
 > = {
   admin: {
     Locations: ["read", "create", "update"],
+    Roles: ["read", "create", "update", "delete"],
   },
   doctor: {
     Locations: ["read", "create", "update"],
