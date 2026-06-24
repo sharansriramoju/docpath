@@ -15,6 +15,8 @@ interface SelectProps
   className?: string;
   onSearch?: (search: string) => void;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onCreateNew?: (search: string) => void;
+  createNewLabel?: string;
 }
 
 const Select = ({
@@ -27,11 +29,18 @@ const Select = ({
   id,
   disabled = false,
   onSearch,
+  onCreateNew,
+  createNewLabel,
   ...props
 }: SelectProps) => {
   const selectId = id || props.name;
 
-  const [optionColor, setOptionColor] = useState("var(--text-muted)");
+  // Derive the text colour from the current value so pre-filled selects (e.g.
+  // in edit mode) render as active rather than looking muted/disabled.
+  const optionColor =
+    value === "" || value === undefined
+      ? "var(--text-muted)"
+      : "var(--text-primary)";
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -119,7 +128,22 @@ const Select = ({
 
               <div className="select-searchable-list">
                 {options.length === 0 ? (
-                  <div className="select-searchable-empty">No results</div>
+                  <div className="select-searchable-empty">
+                    No results
+                    {onCreateNew && search.trim() && (
+                      <button
+                        type="button"
+                        className="select-searchable-create"
+                        onClick={() => {
+                          setOpen(false);
+                          onCreateNew(search.trim());
+                          setSearch("");
+                        }}
+                      >
+                        {createNewLabel ?? `+ Create "${search.trim()}"`}
+                      </button>
+                    )}
+                  </div>
                 ) : (
                   options.map((opt) => (
                     <button
@@ -160,9 +184,6 @@ const Select = ({
         disabled={disabled}
         {...props}
         onChange={(e) => {
-          setOptionColor(
-            e.target.value === "" ? "var(--text-muted)" : "var(--text-primary)",
-          );
           props.onChange?.(e);
         }}
         style={{ color: optionColor }}

@@ -25,9 +25,7 @@ export type AccessAction = "read" | "create" | "update" | "delete";
 
 export type AccessResource =
   | "Locations"
-  | "DoctorRoutines"
   | "Patients"
-  | "Records"
   | "Appointments"
   | "Users"
   | "Roles";
@@ -101,8 +99,6 @@ const ROLE_ACCESS: Record<
   },
   doctor: {
     Locations: ["read", "create", "update"],
-    DoctorRoutines: ["read", "create", "update"],
-    Roles: ["read", "create", "update", "delete"],
   },
   receptionist: {},
   nurse: {},

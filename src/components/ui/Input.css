@@ -175,4 +175,27 @@ select.form-input:focus {
   color: var(--text-muted);
   font-size: var(--font-size-sm);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.select-searchable-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-50, #eef1ff);
+  color: var(--color-primary-600, #4c6ef5);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.select-searchable-create:hover {
+  background: var(--color-primary-100, #dbe4ff);
 }
