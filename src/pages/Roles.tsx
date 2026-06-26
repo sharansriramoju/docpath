@@ -132,13 +132,13 @@ const Roles = () => {
 
   const tableRows = useMemo<RoleRow[]>(
     () =>
-      roles.map((role) => ({
+      roles.map((role: any) => ({
         id: role.role_id,
         role_id: role.role_id,
         name: role.name,
         description: role.description,
         permissionCount: role.permissions.length,
-        permissionSubjects: role.permissions.map((p) =>
+        permissionSubjects: role.permissions.map((p: any) =>
           permissionLabel(p.action, p.subject),
         ),
         created_at: role.created_at,
@@ -148,7 +148,7 @@ const Roles = () => {
 
   const permissionOptions = useMemo(
     () =>
-      permissions.map((p) => ({
+      permissions.map((p: any) => ({
         value: p.permission_id,
         label: permissionLabel(p.action, p.subject),
       })),
@@ -243,7 +243,7 @@ const Roles = () => {
       const next: FormPermission[] = selectedIds.map((id) => {
         const already = existing.get(id);
         if (already) return already;
-        const option = permissionOptions.find((o) => o.value === id);
+        const option = permissionOptions.find((o: any) => o.value === id);
         return {
           permission_id: id,
           label: option?.label ?? id,
@@ -304,9 +304,9 @@ const Roles = () => {
           .filter((p) => !originalPermissions.has(p.permission_id))
           .map((p) => ({ permission_id: p.permission_id, scope: p.scope }));
 
-        const remove_permissions = Array.from(originalPermissions.keys()).filter(
-          (id) => !currentIds.has(id),
-        );
+        const remove_permissions = Array.from(
+          originalPermissions.keys(),
+        ).filter((id) => !currentIds.has(id));
 
         const edit_permissions = formData.permissions
           .filter(
@@ -348,8 +348,7 @@ const Roles = () => {
       await deleteRole(deleteTarget.role_id);
       showToast("Role deleted successfully", "success");
       setDeleteTarget(null);
-      const nextPage =
-        tableRows.length === 1 && page > 1 ? page - 1 : page;
+      const nextPage = tableRows.length === 1 && page > 1 ? page - 1 : page;
       setPage(nextPage);
       await fetchRoles(search, nextPage, limit);
     } catch (error) {

@@ -5,7 +5,24 @@ import Header from "./Header";
 import "./AppLayout.css";
 
 const AppLayout = () => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          color: "var(--text-muted)",
+          fontSize: "var(--font-size-lg)",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;

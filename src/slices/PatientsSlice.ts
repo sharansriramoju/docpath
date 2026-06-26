@@ -3,6 +3,7 @@ import api from "../utils/api";
 
 export interface Patient {
   patient_id?: string;
+  user_id?: string;
   id?: string;
   name: string;
   email: string;
@@ -14,9 +15,8 @@ export interface Patient {
   updated_at?: string;
 }
 
-// The id field name isn't documented; tolerate either patient_id or id.
 export const getPatientId = (patient: Patient): string =>
-  patient.patient_id ?? patient.id ?? "";
+  patient.patient_id ?? patient.user_id ?? patient.id ?? "";
 
 export interface PatientFilters {
   page: number;

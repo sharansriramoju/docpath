@@ -4,6 +4,8 @@ import { LocationsSlice } from "./slices/LocationsSlice";
 import { UsersSlice } from "./slices/UsersSlice";
 import { PatientsSlice } from "./slices/PatientsSlice";
 import { AppointmentsSlice } from "./slices/AppointmentsSlice";
+import { PatientDiagnosticsSlice } from "./slices/PatientDiagnosticsSlice";
+import { RolesSlice } from "./slices/RolesSlice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ const store = configureStore({
     users: UsersSlice.reducer,
     patients: PatientsSlice.reducer,
     appointments: AppointmentsSlice.reducer,
+    patientDiagnostics: PatientDiagnosticsSlice.reducer,
+    roles: RolesSlice.reducer,
   },
 });
 
