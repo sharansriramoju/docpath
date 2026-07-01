@@ -10,10 +10,10 @@ const app = express();
 app.use(compression());
 
 app.use(
-  "/api",
   createProxyMiddleware({
     target: "https://docpath-api-production.up.railway.app",
     changeOrigin: true,
+    pathFilter: "/api",
     cookieDomainRewrite: "",
   }),
 );
