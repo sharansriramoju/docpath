@@ -199,6 +199,7 @@
   border-right: 1px solid var(--border-color);
   white-space: nowrap;
   user-select: none;
+  flex-shrink: 0;
 }
 .login-phone-input {
   flex: 1;

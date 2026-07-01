@@ -1229,13 +1229,7 @@ const Appointments = () => {
             error={createErrors.patient_id}
             disabled={saving}
           />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "var(--space-4)",
-            }}
-          >
+          <div className="modal-form-grid">
             <Select
               label="Doctor"
               value={createForm.doctor_id}
@@ -1259,13 +1253,7 @@ const Appointments = () => {
               disabled={saving}
             />
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "var(--space-4)",
-            }}
-          >
+          <div className="modal-form-grid-3">
             <Input
               label="Date"
               type="date"
@@ -1329,13 +1317,7 @@ const Appointments = () => {
           </>
         }
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "var(--space-4)",
-          }}
-        >
+        <div className="modal-form-grid-3">
           <Input
             label="Date"
             type="date"
@@ -1497,13 +1479,7 @@ const Appointments = () => {
             error={quickPatientErrors.name}
             disabled={patientSaving}
           />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "var(--space-4)",
-            }}
-          >
+          <div className="modal-form-grid">
             <Input
               label="Email (optional)"
               type="email"

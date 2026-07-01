@@ -13,3 +13,12 @@
   flex: 1;
   padding: var(--space-6);
 }
+
+@media (max-width: 768px) {
+  .app-main {
+    margin-left: 0;
+  }
+  .app-content {
+    padding: var(--space-3);
+  }
+}

@@ -1,6 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import type { ElementType } from "react";
-import { LayoutDashboard, Calendar, Users, UserCog, MapPin, Shield } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, UserCog, MapPin, Shield, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import type {
   AccessAction,
@@ -79,57 +80,73 @@ const NAV_SECTIONS: NavSection[] = [
   },
 ];
 
-const Sidebar = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { user, hasPermission, can } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    onClose();
+  }, [location.pathname]);
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-logo">CC</div>
-        <div className="sidebar-brand-text">
-          <h1>ClinicCare</h1>
-          <span>CRM Dashboard</span>
-        </div>
-      </div>
-
-      <nav className="sidebar-nav">
-        {NAV_SECTIONS.map((section) => (
-          <div key={section.label}>
-            <div className="sidebar-section-label">{section.label}</div>
-            {section.items
-              .filter(
-                (item) =>
-                  (!item.permission || hasPermission(item.permission)) &&
-                  (!item.access ||
-                    can(item.access.action, item.access.resource)),
-              )
-              .map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === "/"}
-                  className={({ isActive }) =>
-                    `sidebar-link ${isActive ? "active" : ""}`
-                  }
-                >
-                  <item.icon />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
+    <>
+      {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
+      <aside className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
+        <div className="sidebar-brand">
+          <div className="sidebar-logo">CC</div>
+          <div className="sidebar-brand-text">
+            <h1>ClinicCare</h1>
+            <span>CRM Dashboard</span>
           </div>
-        ))}
-      </nav>
+          <button className="sidebar-close-btn" onClick={onClose}>
+            <X />
+          </button>
+        </div>
 
-      <div className="sidebar-footer">
-        <div className="sidebar-user">
-          <Avatar name={user?.name || "Doctor"} size="sm" />
-          <div className="sidebar-user-info">
-            <div className="sidebar-user-name">{user?.name}</div>
-            <div className="sidebar-user-role">{user?.role}</div>
+        <nav className="sidebar-nav">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.label}>
+              <div className="sidebar-section-label">{section.label}</div>
+              {section.items
+                .filter(
+                  (item) =>
+                    (!item.permission || hasPermission(item.permission)) &&
+                    (!item.access ||
+                      can(item.access.action, item.access.resource)),
+                )
+                .map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/"}
+                    className={({ isActive }) =>
+                      `sidebar-link ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </NavLink>
+                ))}
+            </div>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <Avatar name={user?.name || "Doctor"} size="sm" />
+            <div className="sidebar-user-info">
+              <div className="sidebar-user-name">{user?.name}</div>
+              <div className="sidebar-user-role">{user?.role}</div>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

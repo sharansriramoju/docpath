@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Sidebar from "./Sidebar";
@@ -6,6 +7,10 @@ import "./AppLayout.css";
 
 const AppLayout = () => {
   const { user, authLoading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = useCallback(() => setSidebarOpen((prev) => !prev), []);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   if (authLoading) {
     return (
@@ -30,9 +35,9 @@ const AppLayout = () => {
 
   return (
     <div className="app-layout">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
       <div className="app-main">
-        <Header />
+        <Header onMenuToggle={toggleSidebar} />
         <main className="app-content">
           <Outlet />
         </main>

@@ -18,7 +18,8 @@
   color: var(--text-secondary);
 }
 
-.dashboard-controls input[type="date"] {
+.dashboard-controls input[type="date"],
+.dashboard-controls input[type="month"] {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -29,7 +30,8 @@
   transition: border-color var(--transition-fast);
 }
 
-.dashboard-controls input[type="date"]:focus {
+.dashboard-controls input[type="date"]:focus,
+.dashboard-controls input[type="month"]:focus {
   border-color: var(--color-primary-500);
 }
 
@@ -192,7 +194,7 @@
   opacity: 0.3;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .dashboard-charts {
     grid-template-columns: 1fr;
   }
@@ -200,5 +202,35 @@
   .dashboard-controls {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .chart-card {
+    padding: var(--space-4);
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .kpi-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .kpi-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .kpi-value {
+    font-size: var(--font-size-xl);
+  }
+
+  .chart-card {
+    min-height: 220px;
   }
 }

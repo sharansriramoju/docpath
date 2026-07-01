@@ -433,16 +433,7 @@ const Roles = () => {
       />
 
       <Card>
-        <div
-          style={{
-            padding: "var(--space-4) var(--space-5)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "var(--space-3)",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="card-toolbar">
           <div
             style={{
               display: "flex",
@@ -517,16 +508,7 @@ const Roles = () => {
           }
         />
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "var(--space-4) var(--space-5)",
-            gap: "var(--space-3)",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="card-toolbar">
           <span
             style={{
               fontSize: "var(--font-size-sm)",

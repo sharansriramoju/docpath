@@ -40,7 +40,7 @@ const SearchBar = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        style={{ paddingLeft: "2.25rem", minWidth: 220 }}
+        style={{ paddingLeft: "2.25rem" }}
       />
     </div>
   );
