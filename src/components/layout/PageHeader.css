@@ -22,3 +22,20 @@
   align-items: center;
   gap: var(--space-3);
 }
+
+@media (max-width: 768px) {
+  .page-header {
+    margin-bottom: var(--space-4);
+  }
+  .page-header-left h1 {
+    font-size: var(--font-size-lg);
+  }
+  .page-header-actions {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .page-header-left h1 {
+    font-size: var(--font-size-md);
+  }
+}

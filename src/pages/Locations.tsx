@@ -325,16 +325,7 @@ const Locations = () => {
       />
 
       <Card>
-        <div
-          style={{
-            padding: "var(--space-4) var(--space-5)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "var(--space-3)",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="card-toolbar">
           <div
             style={{
               display: "flex",
@@ -395,16 +386,7 @@ const Locations = () => {
           }
         />
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "var(--space-4) var(--space-5)",
-            gap: "var(--space-3)",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="card-toolbar">
           <span
             style={{
               fontSize: "var(--font-size-sm)",
@@ -470,13 +452,7 @@ const Locations = () => {
             error={formErrors.name}
             disabled={saving}
           />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "var(--space-4)",
-            }}
-          >
+          <div className="modal-form-grid">
             <Input
               label="Latitude"
               placeholder="e.g. 24.8607"

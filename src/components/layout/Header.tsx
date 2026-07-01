@@ -1,8 +1,12 @@
-import { Bell, LogOut } from "lucide-react";
+import { Bell, LogOut, Menu } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import "./Header.css";
 
-const Header = () => {
+interface HeaderProps {
+  onMenuToggle: () => void;
+}
+
+const Header = ({ onMenuToggle }: HeaderProps) => {
   const { user, logout } = useAuth();
 
   const hour = new Date().getHours();
@@ -12,6 +16,9 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
+        <button className="header-menu-btn" onClick={onMenuToggle} title="Menu">
+          <Menu />
+        </button>
         <span className="header-greeting">
           {greeting}, <strong>Dr. {user?.name?.split(" ").pop()}</strong>
         </span>
