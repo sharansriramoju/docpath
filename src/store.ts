@@ -6,6 +6,7 @@ import { PatientsSlice } from "./slices/PatientsSlice";
 import { AppointmentsSlice } from "./slices/AppointmentsSlice";
 import { PatientDiagnosticsSlice } from "./slices/PatientDiagnosticsSlice";
 import { RolesSlice } from "./slices/RolesSlice";
+import { DashboardSlice } from "./slices/DashboardSlice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     appointments: AppointmentsSlice.reducer,
     patientDiagnostics: PatientDiagnosticsSlice.reducer,
     roles: RolesSlice.reducer,
+    dashboard: DashboardSlice.reducer,
   },
 });
 

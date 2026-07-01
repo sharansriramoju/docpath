@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import type { ElementType } from "react";
-import { Calendar, Users, UserCog, MapPin, Shield } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, UserCog, MapPin, Shield } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import type {
   AccessAction,
@@ -30,6 +30,11 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: "Main",
     items: [
+      {
+        to: "/dashboard",
+        icon: LayoutDashboard,
+        label: "Dashboard",
+      },
       {
         to: "/appointments",
         icon: Calendar,
