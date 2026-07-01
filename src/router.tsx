@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import PermissionGuard from "./utils/PermissionGuard";
+import Dashboard from "./pages/Dashboard";
 import Appointments from "./pages/Appointments";
 import Patients from "./pages/Patients";
 import UserManagement from "./pages/UserManagement";
@@ -13,7 +14,8 @@ const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
-      { index: true, element: <Navigate to="/appointments" replace /> },
+      { index: true, element: <Navigate to="/dashboard" replace /> },
+      { path: "dashboard", element: <Dashboard /> },
       { path: "appointments", element: <Appointments /> },
       { path: "patients", element: <Patients /> },
       {
