@@ -12,4 +12,17 @@ export default defineConfig({
       },
     },
   },
+  // server: {
+  //   port: 5173,
+  //   // Set to true or '0.0.0.0' to allow external tunnels
+  //   host: true,
+  //   // Vite 6+ requires you to explicitly allow hostnames to prevent 403 errors
+  //   allowedHosts: true,
+  //   proxy: {
+  //     "/api": {
+  //       target: "http://192.168.1.4:3000",
+  //       changeOrigin: true,
+  //     },
+  //   },
+  // },
 });

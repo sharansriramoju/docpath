@@ -98,7 +98,7 @@
   .modal,
   .modal-lg {
     max-width: 100%;
-    max-height: 95vh;
+    max-height: 95dvh;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   }
   .modal-header {
@@ -115,8 +115,8 @@
   .modal,
   .modal-lg {
     border-radius: 0;
-    height: 100vh;
-    max-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
   }
   .modal-form-grid,
   .modal-form-grid-3 {
