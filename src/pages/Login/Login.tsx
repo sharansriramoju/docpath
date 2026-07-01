@@ -122,6 +122,7 @@ const Login = () => {
 
   return (
     <div className="login-page">
+      <div id="recaptcha-container" />
       {/* Decorative background */}
       <div className="login-bg">
         <div className="login-bg-circle login-bg-circle--1" />

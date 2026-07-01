@@ -9,20 +9,13 @@ export const LoginSlice = createSlice({
   reducers: {},
 });
 
-export const sendOtpRdx = (phone: string) => async () => {
+export const firebaseLoginRdx = (idToken: string) => async () => {
   try {
-    const response = await api.post("/send-otp-login", { phone });
+    const response = await api.post("/auth/firebase-login", {
+      id_token: idToken,
+    });
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to send OTP");
-  }
-};
-
-export const verifyOtpRdx = (phone: string, otp: string) => async () => {
-  try {
-    const response = await api.post("/verify-otp-login", { phone, otp });
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message ?? "Failed to verify OTP");
+    throw new Error(error.response?.data?.message ?? "Failed to sign in");
   }
 };

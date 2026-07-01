@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { sendOtpRdx, verifyOtpRdx } from "../slices/LoginSlice";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  type ConfirmationResult,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { firebaseLoginRdx } from "../slices/LoginSlice";
 import { useAuth } from "../context/AuthContext";
 import type { AppDispatch } from "../store";
 
@@ -14,24 +20,59 @@ const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const confirmationRef = useRef<ConfirmationResult | null>(null);
+  const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
+
+  const getRecaptcha = useCallback(() => {
+    if (!recaptchaRef.current) {
+      recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+      });
+    }
+    return recaptchaRef.current;
+  }, []);
+
+  const resetRecaptcha = useCallback(() => {
+    if (recaptchaRef.current) {
+      recaptchaRef.current.clear();
+      recaptchaRef.current = null;
+    }
+  }, []);
+
   const sendOtp = async (digits: string) => {
     setLoading(true);
     setError("");
     try {
-      await dispatch(sendOtpRdx(digits));
+      const verifier = getRecaptcha();
+      const fullPhone = `+91${digits}`;
+      const result = await signInWithPhoneNumber(auth, fullPhone, verifier);
+      confirmationRef.current = result;
     } catch (err: any) {
-      setError(err.message || "Failed to send OTP");
+      resetRecaptcha();
+      const msg =
+        err.code === "auth/invalid-phone-number"
+          ? "Invalid phone number"
+          : err.code === "auth/too-many-requests"
+            ? "Too many attempts. Please try again later"
+            : err.message || "Failed to send OTP";
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyOtp = async (digits: string, code: string) => {
+  const verifyOtp = async (_digits: string, code: string) => {
     setLoading(true);
     setError("");
     try {
-      const result: any = await dispatch(verifyOtpRdx(digits, code));
+      if (!confirmationRef.current) {
+        throw new Error("No confirmation result. Please resend the OTP.");
+      }
+      const credential = await confirmationRef.current.confirm(code);
+      const idToken = await credential.user.getIdToken();
+
+      const result: any = await dispatch(firebaseLoginRdx(idToken));
       const userData = result.data;
       const roleName = (userData.role?.name || "doctor").toLowerCase() as
         | "admin"
@@ -52,7 +93,13 @@ const useLogin = () => {
       });
       navigate("/");
     } catch (err: any) {
-      setError(err.message || "Failed to verify OTP");
+      const msg =
+        err.code === "auth/invalid-verification-code"
+          ? "Invalid verification code"
+          : err.code === "auth/code-expired"
+            ? "Code expired. Please resend"
+            : err.message || "Failed to verify OTP";
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
