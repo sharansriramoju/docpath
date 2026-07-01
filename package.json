@@ -7,11 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.15.1",
+    "compression": "^1.8.1",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^4.1.1",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
